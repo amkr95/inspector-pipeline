@@ -1,0 +1,692 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description":"Security: Setup AWS Inspector Pipeline based on existing tag conventions",
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "EC2 Tags used by Inspector"
+          },
+          "Parameters": [
+            "EC2Tag1Key",
+            "EC2Tag1Value",
+            "EC2Tag2Key",
+            "EC2Tag2Value",
+            "EC2Tag3Key",
+            "EC2Tag3Value",
+            "EC2Tag4Key",
+            "EC2Tag4Value",
+            "EC2Tag5Key",
+            "EC2Tag5Value",
+            "EC2Tag6Key",
+            "EC2Tag6Value",
+            "EC2Tag7Key",
+            "EC2Tag7Value",
+            "EC2Tag8Key",
+            "EC2Tag8Value",
+            "EC2Tag9Key",
+            "EC2Tag9Value",
+            "EC2Tag10Key",
+            "EC2Tag10Value",
+            "EC2Tag11Key",
+            "EC2Tag11Value",
+            "EC2Tag12Key",
+            "EC2Tag12Value",
+            "EC2Tag13Key",
+            "EC2Tag13Value",
+            "EC2Tag14Key",
+            "EC2Tag14Value",
+            "EC2Tag15Key",
+            "EC2Tag15Value"
+          ]
+        }
+      ]
+    }
+  },
+  "Parameters" : {
+    "AssessmentTemplateName": {
+      "Description": "What to name the AWS Inspector Assessment Template",
+      "Type": "String",
+      "Default": "inspector-assessment-template"
+    },
+    "AssessmentTargetName": {
+      "Description": "What to name the AWS Inspector Assessment Target",
+      "Type": "String",
+      "Default": "inspector-assessment-target"
+    },
+    "InspectorRunCronSchedule": {
+      "Description": "Inspector Run trigger time ",
+      "Type": "String",
+      "Default": "cron(30 11 ? * SAT *)"
+    },
+    "PushInspectorFindingsToSNSCronSchedule": {
+      "Description": "Inspector Run trigger time ",
+      "Type": "String",
+      "Default": "cron(0 20 ? * SAT *)"
+    },
+    "SnsTopicToPushInspectorFindings":{
+      "Description": "SNS topic name to push Inspector findings to",
+      "Type": "String",
+      "Default": "arn:aws:sns:us-west-2:<insert_a_valid_account_id_here>:inspector-findings"
+    },
+    "EC2Tag1Key":{
+      "Description": "Tag 1 name",
+      "Type": "String",
+      "Default": "Environment"
+    },
+    "EC2Tag1Value":{
+      "Description": "Tag 1 value",
+      "Type": "String",
+      "Default": "Development"
+    },
+    "EC2Tag2Key":{
+      "Description": "Tag 2 name",
+      "Type": "String",
+      "Default": "Environment"
+    },
+    "EC2Tag2Value":{
+      "Description": "Tag 2 value",
+      "Type": "String",
+      "Default": "dev"
+    },
+    "EC2Tag3Key":{
+      "Description": "Tag 3 name",
+      "Type": "String",
+      "Default": "Environment"
+    },
+    "EC2Tag3Value":{
+      "Description": "Tag 3 value",
+      "Type": "String",
+      "Default": "Dev"
+    },
+    "EC2Tag4Key":{
+      "Description": "Tag 4 name",
+      "Type": "String",
+      "Default": "Environment"
+    },
+    "EC2Tag4Value":{
+      "Description": "Tag 4 value",
+      "Type": "String",
+      "Default": "development"
+    },
+    "EC2Tag5Key":{
+      "Description": "Tag 5 name",
+      "Type": "String",
+      "Default": "Environment"
+    },
+    "EC2Tag5Value":{
+      "Description": "Tag 5 value",
+      "Type": "String",
+      "Default": "Production"
+    },
+    "EC2Tag6Key":{
+      "Description": "Tag 6 name",
+      "Type": "String",
+      "Default": "Environment"
+    },
+    "EC2Tag6Value":{
+      "Description": "Tag 6 value",
+      "Type": "String",
+      "Default": "prod"
+    },
+    "EC2Tag7Key":{
+      "Description": "Tag 7 name",
+      "Type": "String",
+      "Default": "Environment"
+    },
+    "EC2Tag7Value":{
+      "Description": "Tag 7 value",
+      "Type": "String",
+      "Default": "Prod"
+    },
+    "EC2Tag8Key":{
+      "Description": "Tag 8 name",
+      "Type": "String",
+      "Default": "Environment"
+    },
+    "EC2Tag8Value":{
+      "Description": "Tag 8 value",
+      "Type": "String",
+      "Default": "Preview"
+    },
+    "EC2Tag9Key":{
+      "Description": "Tag 9 name",
+      "Type": "String",
+      "Default": "Environment"
+    },
+    "EC2Tag9Value":{
+      "Description": "Tag 9 value",
+      "Type": "String",
+      "Default": "preview"
+    },
+    "EC2Tag10Key":{
+      "Description": "Tag 10 name",
+      "Type": "String",
+      "Default": "Environment"
+    },
+    "EC2Tag10Value":{
+      "Description": "Tag 10 value",
+      "Type": "String",
+      "Default": "Staging"
+    },
+    "EC2Tag11Key":{
+      "Description": "Tag 11 name",
+      "Type": "String",
+      "Default": "Environment"
+    },
+    "EC2Tag11Value":{
+      "Description": "Tag 11 value",
+      "Type": "String",
+      "Default": "staging"
+    },
+    "EC2Tag12Key":{
+      "Description": "Tag 12 name",
+      "Type": "String",
+      "Default": "Environment"
+    },
+    "EC2Tag12Value":{
+      "Description": "Tag 12 value",
+      "Type": "String",
+      "Default": "Stage"
+    },
+    "EC2Tag13Key":{
+      "Description": "Tag 13 name",
+      "Type": "String",
+      "Default": "Environment"
+    },
+    "EC2Tag13Value":{
+      "Description": "Tag 13 value",
+      "Type": "String",
+      "Default": "stage"
+    },
+    "EC2Tag14Key":{
+      "Description": "Tag 14 name",
+      "Type": "String",
+      "Default": ""
+    },
+    "EC2Tag14Value":{
+      "Description": "Tag 14 value",
+      "Type": "String",
+      "Default": ""
+    },
+    "EC2Tag15Key":{
+      "Description": "Tag 15 name",
+      "Type": "String",
+      "Default": ""
+    },
+    "EC2Tag15Value":{
+      "Description": "Tag 15 value",
+      "Type": "String",
+      "Default": ""
+    }
+  },
+  "Mappings" : {
+    "RegionMap" : {
+      "us-east-1" : { "inspectorAccount" : "316112463485" },
+      "us-west-2" : { "inspectorAccount" : "758058086616" },
+	    "us-west-1" : { "inspectorAccount" : "166987590008" },
+	    "eu-west-1" : { "inspectorAccount" : "357557129151" },
+	    "eu-central-1" : { "inspectorAccount" : "537503971621" },
+	    "ap-northeast-1" : { "inspectorAccount" : "406045910587" },
+	    "ap-northeast-2" : { "inspectorAccount" : "526946625049" },
+	    "ap-southeast-2" : { "inspectorAccount" : "454640832652" },
+	    "ap-south-1" : { "inspectorAccount" : "162588757376" }
+    },
+    "RulesPackageIds" : {
+      "us-east-1" : {
+        "1" : "0-R01qwB5Q",
+        "2" : "0-gBONHN9h",
+        "3" : "0-gEjTy7T7",
+        "4" : "0-rExsr2X8"
+      },
+      "us-west-1" : {
+        "1" : "0-TKgzoVOa",
+        "2" : "0-byoQRFYm",
+        "3" : "0-xUY8iRqX",
+        "4" : "0-yeYxlt0x"
+      },
+      "us-west-2" : {
+        "1" : "0-9hgA516p",
+        "2" : "0-H5hpSawc",
+        "3" : "0-JJOtZiqQ",
+        "4" : "0-vg5GGHSD"
+      },
+      "eu-west-1" : {
+        "1" : "0-SnojL3Z6",
+        "2" : "0-lLmwe1zd",
+        "3" : "0-sJBhCr0F",
+        "4" : "0-ubA5XvBh"
+      },
+      "eu-central-1" : {
+        "1" : "0-0GMUM6fg",
+        "2" : "0-ZujVHEPB",
+        "3" : "0-nZrAVuv8",
+        "4" : "0-wNqHa8M9"
+      },
+      "ap-northeast-1" : {
+        "1" : "0-7WNjqgGu",
+        "2" : "0-bBUQnxMq",
+        "3" : "0-gHP9oWNT",
+        "4" : "0-knGBhqEu"
+      },
+      "ap-northeast-2" : {
+        "1" : "0-2WRpmi4n",
+        "2" : "0-PoGHMznc",
+        "3" : "0-PoYq7lI7",
+        "4" : "0-T9srhg1z"
+      },
+      "ap-southeast-2" : {
+        "1" : "0-D5TGAxiR",
+        "2" : "0-P8Tel2Xj",
+        "3" : "0-Vkd2Vxjq",
+        "4" : "0-asL6HRgN"
+      },
+      "ap-south-1" : {
+        "1" : "0-EhMQZy6C",
+        "2" : "0-LqnJE9dO",
+        "3" : "0-PSUlX14m",
+        "4" : "0-fs0IZZBj"
+      }
+    }
+  },
+  "Resources": {
+    "lambdaInspectorRole" : {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+
+        "AssumeRolePolicyDocument": {
+          "Version" : "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "LambdaInspectorRoleAccess",
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "awsInspectorServiceRole" : {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version" : "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "AwsInspectorRoleAccess",
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "inspector.amazonaws.com"
+              },
+              "Condition": {
+                "StringEquals": {"sts:ExternalId":{"Ref" : "AWS::AccountId" }}
+              }
+            }
+          ]
+        }
+      }
+    },
+    "awsInspectorServiceRoleInlinePolicy":{
+     "Type" : "AWS::IAM::Policy",
+     "Properties" : {
+
+    "PolicyDocument" : {
+      "Version": "2012-10-17",
+      "Statement": [
+      {
+       "Effect": "Allow",
+       "Action": [
+        "ec2:DescribeInstances"
+       ],
+       "Resource": [
+        "*"
+       ]
+     }
+     ]
+    },
+    "PolicyName" : "AwsInspectorServiceRoleInlinePolicy",
+    "Roles" : [ { "Ref": "awsInspectorServiceRole" }]
+    }
+   },
+   "lambdaInspectorInlinePolicy":{
+     "Type" : "AWS::IAM::Policy",
+     "Properties" : {
+
+    "PolicyDocument" : {
+      "Version": "2012-10-17",
+      "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:*:*:*"
+      },
+      {
+          "Effect": "Allow",
+            "Action": [
+              "inspector:Create*",
+              "inspector:DescribeFindings",
+              "inspector:ListAssessmentRuns",
+              "inspector:ListAssessmentTemplates",
+              "inspector:ListFindings",
+              "inspector:StartAssessmentRun",
+	            "inspector:RegisterCrossAccountAccessRole",
+              "lambda:InvokeFunction",
+              "iam:List*"
+              ],
+          "Resource": "*"
+        }
+     ]
+    },
+    "PolicyName" : "LambdaInspectorInlinePolicy",
+    "Roles" : [ { "Ref": "lambdaInspectorRole" }]
+    }
+   },
+
+   "InspectorRunnerLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+       "Properties" : {
+         "Environment": {
+           "Variables": {
+             "EC2Tag1Key": { "Ref": "EC2Tag1Key" },
+             "EC2Tag1Value": { "Ref": "EC2Tag1Value" },
+             "EC2Tag2Key": { "Ref": "EC2Tag2Key" },
+             "EC2Tag2Value": { "Ref": "EC2Tag2Value" },
+             "EC2Tag3Key": { "Ref": "EC2Tag3Key" },
+             "EC2Tag3Value": { "Ref": "EC2Tag3Value" },
+             "EC2Tag4Key": { "Ref": "EC2Tag4Key" },
+             "EC2Tag4Value": { "Ref": "EC2Tag4Value" },
+             "EC2Tag5Key": { "Ref": "EC2Tag5Key" },
+             "EC2Tag5Value": { "Ref": "EC2Tag5Value" },
+             "EC2Tag6Key": { "Ref": "EC2Tag6Key" },
+             "EC2Tag6Value": { "Ref": "EC2Tag6Value" },
+             "EC2Tag7Key": { "Ref": "EC2Tag7Key" },
+             "EC2Tag7Value": { "Ref": "EC2Tag7Value" },
+             "EC2Tag8Key": { "Ref": "EC2Tag8Key" },
+             "EC2Tag8Value": { "Ref": "EC2Tag8Value" },
+             "EC2Tag9Key": { "Ref": "EC2Tag9Key" },
+             "EC2Tag9Value": { "Ref": "EC2Tag9Value" },
+             "EC2Tag10Key": { "Ref": "EC2Tag10Key" },
+             "EC2Tag10Value": { "Ref": "EC2Tag10Value" },
+             "EC2Tag11Key": { "Ref": "EC2Tag11Key" },
+             "EC2Tag11Value": { "Ref": "EC2Tag11Value" },
+             "EC2Tag12Key": { "Ref": "EC2Tag12Key" },
+             "EC2Tag12Value": { "Ref": "EC2Tag12Value" },
+             "EC2Tag13Key": { "Ref": "EC2Tag13Key" },
+             "EC2Tag13Value": { "Ref": "EC2Tag13Value" },
+             "EC2Tag14Key": { "Ref": "EC2Tag14Key" },
+             "EC2Tag14Value": { "Ref": "EC2Tag14Value" },
+             "EC2Tag15Key": { "Ref": "EC2Tag15Key" },
+             "EC2Tag15Value": { "Ref": "EC2Tag15Value" }
+           }
+         },
+        "Code": {
+          "ZipFile": {"Fn::Join": ["", [
+"from __future__ import print_function", "\n",
+"import boto3", "\n",
+"import json", "\n",
+"import datetime", "\n",
+"import os", "\n",
+"import cfnresponse", "\n",
+"# Edit the below to pick and choose which hosts Inspector should scan.", "\n",
+"####  IMPORTANT NOTE: If a machine that is tagged with the below does not have the Inspector agent", "\n",
+"####  installed, assessment runs WILL NOT start.", "\n",
+"scan_duration_in_seconds = 3600", "\n",
+"rule_packages=[", "\n",
+"    'arn:aws:inspector:", { "Ref": "AWS::Region" }, ":", { "Fn::FindInMap": [ "RegionMap", { "Ref": "AWS::Region" }, "inspectorAccount" ]},
+            ":rulespackage/", { "Fn::FindInMap": [ "RulesPackageIds", { "Ref": "AWS::Region" }, "1" ]}, "',", "\n",
+            "    'arn:aws:inspector:", { "Ref": "AWS::Region" }, ":", { "Fn::FindInMap": [ "RegionMap", { "Ref": "AWS::Region" }, "inspectorAccount" ]},
+            ":rulespackage/", { "Fn::FindInMap": [ "RulesPackageIds", { "Ref": "AWS::Region" }, "2" ]}, "',", "\n",
+            "    'arn:aws:inspector:", { "Ref": "AWS::Region" }, ":", { "Fn::FindInMap": [ "RegionMap", { "Ref": "AWS::Region" }, "inspectorAccount" ]},
+            ":rulespackage/", { "Fn::FindInMap": [ "RulesPackageIds", { "Ref": "AWS::Region" }, "3" ]}, "',", "\n",
+            "    'arn:aws:inspector:", { "Ref": "AWS::Region" }, ":", { "Fn::FindInMap": [ "RegionMap", { "Ref": "AWS::Region" }, "inspectorAccount" ]},
+            ":rulespackage/", { "Fn::FindInMap": [ "RulesPackageIds", { "Ref": "AWS::Region" }, "4" ]}, "'", "\n",
+"]", "\n",
+"inspector = boto3.client('inspector')", "\n",
+"iam = boto3.client('iam')", "\n",
+"def setup_inspector():", "\n",
+"    print('Setting up inspector for the first time')", "\n",
+"    tags = []", "\n",
+"    for x in range(1, 51):","\n",
+"        keyName = \"EC2Tag%dKey\" % x","\n",
+"        keyValue = \"EC2Tag%dValue\" % x","\n",
+"        key, val = os.getenv(keyName), os.getenv(keyValue)","\n",
+"        print('Tags used by inspector:')", "\n",
+"        if key and val:","\n",
+"            tags.append({'key': key, 'value': val})","\n",
+"            print('Key: ' + key + ', Value: ' + val)", "\n",
+"    resource_group = inspector.create_resource_group(resourceGroupTags=tags)", "\n",
+"    assessment_target = inspector.create_assessment_target(assessmentTargetName='", { "Ref" : "AssessmentTargetName" }, "',resourceGroupArn=resource_group['resourceGroupArn'])", "\n",
+"    response = inspector.create_assessment_template(", "\n",
+"                assessmentTargetArn=assessment_target['assessmentTargetArn'],", "\n",
+"                assessmentTemplateName='", { "Ref" : "AssessmentTemplateName" } ,"',", "\n",
+"                durationInSeconds=scan_duration_in_seconds,", "\n",
+"                rulesPackageArns=rule_packages)", "\n",
+"    print('Inspector set up successfully')", "\n",
+"    response = iam.list_roles()", "\n",
+"    for role in response['Roles']:", "\n",
+"        if '",{ "Ref" : "awsInspectorServiceRole" },"' in role['RoleName']:", "\n",
+"            print('Using ",{ "Ref" : "awsInspectorServiceRole" }," for cross account access')", "\n",
+"            inspector_role = role['Arn']", "\n",
+"            inspector.register_cross_account_access_role(roleArn=inspector_role)", "\n",
+"            break;", "\n",
+"def get_assessment_template_arn():", "\n",
+"    atrn = inspector.list_assessment_templates(filter = {'namePattern': '", { "Ref" : "AssessmentTemplateName" },"'})", "\n",
+"    template_arns = atrn['assessmentTemplateArns']", "\n",
+"    while 'nextToken' in atrn.keys():", "\n",
+"        template_arns.append(atrn['assessmentTemplateArns'])", "\n",
+"    return map(str,template_arns)", "\n",
+"def lambda_handler(event, context):", "\n",
+"    templateArns = get_assessment_template_arn()", "\n",
+"    print('Existing template arns: ' + str(templateArns))", "\n",
+"    if len(templateArns) == 0:", "\n",
+"        print('No template arns exist for this type yet, need to set up inspector for the first time')", "\n",
+"        setup_inspector()", "\n",
+"        templateArns = get_assessment_template_arn()", "\n",
+"        responseData = {}", "\n",
+"        responseData['Data'] = 'Setting up Inspector...'", "\n",
+"        cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)", "\n",
+"    else:", "\n",
+"        for arn in templateArns:", "\n",
+"            print('Starting assessment run for template arn: ' + arn)", "\n",
+"            inspector.start_assessment_run(assessmentTemplateArn=arn)", "\n",
+"        return 0", "\n"
+            ]]}
+        },
+         "Handler":"index.lambda_handler",
+        "Role": {"Fn::GetAtt": ["lambdaInspectorRole", "Arn"]},
+        "Runtime": "python2.7",
+        "Timeout": 300
+
+       }
+   },
+   "CallInspectorLambda": {
+      "Type": "Custom::LambdaCallout",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "InspectorRunnerLambdaFunction",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn" : "InspectorRunnerLambdaFunction"
+    },
+   "InspectorLambdaTrigger": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+      "Description": "Run Lambda every sunday",
+      "ScheduleExpression": { "Ref" : "InspectorRunCronSchedule" },
+      "State": "ENABLED",
+      "Targets": [{
+       "Arn": { "Fn::GetAtt": ["InspectorRunnerLambdaFunction", "Arn"] },
+       "Id": "InspectorTargetFunctionV1"
+       }]
+      }
+    },
+   "PermissionForEventsToInvokeInsLambda": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+     "FunctionName": { "Ref": "InspectorRunnerLambdaFunction" },
+     "Action": "lambda:InvokeFunction",
+     "Principal": "events.amazonaws.com",
+     "SourceArn": { "Fn::GetAtt": ["InspectorLambdaTrigger", "Arn"] }
+    }
+   },
+   "PermissionForCFToInvokeInsLambda": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+     "FunctionName": { "Ref": "InspectorRunnerLambdaFunction" },
+     "Action": "lambda:InvokeFunction",
+     "Principal": "cloudformation.amazonaws.com"
+    }
+   },
+   "LambdaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [{
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "Action": ["sts:AssumeRole"]
+          }]
+        },
+        "Path": "/",
+        "Policies": [{
+          "PolicyName": "logs",
+          "PolicyDocument": {
+            "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": "arn:aws:logs:*:*:*"
+            }]
+          }
+        }, {
+          "PolicyName": "sns",
+          "PolicyDocument": {
+            "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "sns:*",
+                "iam:ListAccount*"
+              ],
+              "Resource": "*"
+            }]
+          }
+        }, {
+            "PolicyName": "read-inspector",
+          "PolicyDocument": {
+            "Statement": [{
+              "Effect": "Allow",
+              "Action": [
+                "inspector:*",
+		"ec2:DescribeInstances",
+		"ec2:DescribeTags"
+              ],
+              "Resource": "*"
+            }]
+          }
+
+        }]
+      }
+    },
+    "InspectorToSnsLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Environment":{ "Variables":{"PROD_SNS_TOPIC":{"Ref":"SnsTopicToPushInspectorFindings"}}},
+        "Code": {
+          "ZipFile": {"Fn::Join": ["", [
+"import boto3", "\n",
+"import time", "\n",
+"import subprocess", "\n",
+"import json", "\n",
+"import os","\n",
+"from datetime import datetime,timedelta", "\n",
+"def lambda_handler(event, context):", "\n",
+"     sns = boto3.client('sns', region_name=os.environ['PROD_SNS_TOPIC'].split(':')[3])", "\n",
+"     inspector = boto3.client('inspector')", "\n",
+"     iam = boto3.client('iam')", "\n",
+"     states=['FAILED','COMPLETED','COMPLETED_WITH_ERRORS']", "\n",
+"     completion_time_range={}", "\n",
+"     completion_time_range['beginDate']=datetime.now() - timedelta(days=1)", "\n",
+"     completion_time_range['endDate']=datetime.now()", "\n",
+"     result=inspector.list_assessment_runs(filter={'namePattern': '*wbts-ics-assessment-template*','states':states,'completionTimeRange':completion_time_range})", "\n",
+"     print('Assessment runs picked up: ' + str(result))", "\n",
+"     assessment_arns=result['assessmentRunArns']", "\n",
+"     for i in assessment_arns:", "\n",
+"          acno=int(i.split(':')[4])", "\n",
+"          print('Processing findings for account: ' + str(acno))", "\n",
+"          nextToken=''", "\n",
+"          while True:", "\n",
+"               if nextToken:", "\n",
+"                    findings=inspector.list_findings(assessmentRunArns=[i],maxResults=200,nextToken=nextToken)", "\n",
+"               else:", "\n",
+"                    findings=inspector.list_findings(assessmentRunArns=[i],maxResults=200)", "\n",
+"               for finding in findings['findingArns']:", "\n",
+"                    finding_desc=inspector.describe_findings(findingArns=[finding])", "\n",
+"                    message_to_send=finding_desc['findings'][0]", "\n",
+"                    message_to_send['aws-account']=iam.list_account_aliases()['AccountAliases'][0]", "\n",
+"                    message_to_send['aws-account-id']=acno","\n",
+"                    createdTime=message_to_send['createdAt']", "\n",
+"                    updatedTime=message_to_send['updatedAt']", "\n",
+"                    message_to_send['createdAt']=createdTime.strftime('%Y-%m-%d %H:%M:%S')", "\n",
+"                    message_to_send['updatedAt']=updatedTime.strftime('%Y-%m-%d %H:%M:%S')", "\n",
+"                    #print message_to_send", "\n",
+"                    send_message_to_sns(sns,json.dumps(message_to_send))", "\n",
+"               if 'nextToken' in findings:", "\n",
+"                    nextToken=findings['nextToken']", "\n",
+"               else:", "\n",
+"                    break", "\n",
+"def send_message_to_sns(sns,message):", "\n",
+"     try:", "\n",
+"          response=sns.publish(TargetArn=os.environ['PROD_SNS_TOPIC'],Message=message,Subject='Inspector findings')", "\n",
+"     except Exception as ex:", "\n",
+"          print ex","\n",
+"          print 'Error sending message to queue'", "\n"
+        ]]}
+        },
+        "Handler": "index.lambda_handler",
+        "MemorySize": 256,
+        "Role": {"Fn::GetAtt": ["LambdaRole", "Arn"]},
+        "Runtime": "python2.7",
+        "Timeout": 300
+      }
+    },
+"LambdaTrigger": {
+  "Type": "AWS::Events::Rule",
+  "Properties": {
+    "Description": "Push Inspector findings to SNS",
+    "ScheduleExpression": {"Ref":"PushInspectorFindingsToSNSCronSchedule"},
+    "State": "ENABLED",
+    "Targets": [{
+      "Arn": { "Fn::GetAtt": ["InspectorToSnsLambdaFunction", "Arn"] },
+      "Id": "TargetFunctionV1"
+    }]
+  }
+},
+"PermissionForEventsToInvokeLambda": {
+  "Type": "AWS::Lambda::Permission",
+  "Properties": {
+    "FunctionName": { "Ref": "InspectorToSnsLambdaFunction" },
+    "Action": "lambda:InvokeFunction",
+    "Principal": "events.amazonaws.com",
+    "SourceArn": { "Fn::GetAtt": ["LambdaTrigger", "Arn"] }
+  }
+}
+  }
+}
